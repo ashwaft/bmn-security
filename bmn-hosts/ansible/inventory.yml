@@ -1,0 +1,6 @@
+bmn-hosts:
+  hosts:
+    bmn-host-1:
+      ansible_host: bmn-host-1
+    bmn-host-2:
+      ansible_host: bmn-host-2

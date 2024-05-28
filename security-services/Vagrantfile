@@ -1,0 +1,39 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  # --- 
+  # Secuirity Service Host Config 1
+  # --
+  config.vm.define "security-service-host-1" do |host1|
+    config.vm.box = "ubuntu/bionic64"
+    host1.vm.hostname     = "core-central-server"
+    host1.vm.boot_timeout = 600
+
+    config.vm.provider "virtualbox" do |vb|
+      vb.memory = "256"
+      vb.cpus   = 1
+    end
+
+    host1.vm.provision "ansible" do |ansible|
+      ansible.playbook       = "ansible/setup-rsyslog.yml"  
+      ansible.inventory_path = "ansible/inventory.yml"
+    end
+  end
+
+  # --- 
+  # # Secuirity Service Host Config 2
+  # # --
+  # config.vm.define "security-service-host-2" do |host2|
+  #   host2.vm.box          = "ubuntu/bionic64"
+  #   host2.vm.hostname     = "log-server"
+  #   host2.vm.boot_timeout = 600
+
+  #   host2.vm.provision "ansible" do |ansible|
+  #     ansible.playbook       = "ansible/setup-rsyslog.yml"  
+  #     ansible.inventory_path = "ansible/inventory.yml"
+  #   end
+  # end
+
+end
