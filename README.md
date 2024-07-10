@@ -49,6 +49,4 @@ Verify that Nginx access logs from VM1 are being successfully forwarded to the r
 - In VM2, execute the following tail command to monitor and display the last few lines, so keep the terminal open: `tail -f /var/log/nginx.log`
 
 - In VM1 (or any other host), we can try to access the server by using the curl command:
-`curl http://192.168.56.11` to show access logs for `status code 200` OR `curl http://192.168.56.11/error` to stream error logs with `status code 404`
-
-While step 6b is being executed, we can observe that the sample logs will be streamed and available on VM2.
+`curl http://192.168.56.11` to show access logs for `status code 200` OR `curl http://192.168.56.11/error` to stream error logs with `status code 404`. While this is being executed, we can observed the logs being streamed into vm2!
