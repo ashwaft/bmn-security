@@ -1,0 +1,5 @@
+module(load="imudp")
+input(type="imudp" port="514")
+
+# Define an output action to save logs to a file
+local0.* /var/log/nginx.log
