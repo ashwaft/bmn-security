@@ -1,0 +1,94 @@
+---
+- hosts: vm1
+  become: true
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.package:
+        name: nginx
+        state: present
+    
+    - name: Start and enable Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+      
+    - name: Add include directive to Nginx default configuration
+      ansible.builtin.lineinfile:
+        path: /etc/nginx/sites-enabled/default
+        line: "include /etc/nginx/conf.d/*.conf;"
+        insertafter: "server_name _;"
+        state: present
+      notify: Restart Nginx
+
+    - name: Set hostname to vm1
+      ansible.builtin.hostname:
+        name: vm1
+
+    - name: Remove duplicate entry from /etc/hosts
+      ansible.builtin.replace:
+        path: /etc/hosts
+        regexp: '^\s*127\.0\.1\.1[[:space:]]+ubuntu1804\.localdomain$'
+        replace: ''
+
+    - name: Update /etc/hosts file
+      ansible.builtin.lineinfile:
+        path: /etc/hosts
+        line: "192.168.56.12 ubuntu1804.localdomain"
+        state: present
+        insertafter: BOF
+
+    - name: Download Puppet repository configuration .deb file
+      ansible.builtin.get_url:
+        url: https://apt.puppetlabs.com/puppet6-release-bionic.deb
+        dest: /tmp/puppet6-release-bionic.deb
+
+    - name: Install Puppet repository configuration
+      ansible.builtin.command: dpkg -i /tmp/puppet6-release-bionic.deb
+      become: true
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install Puppet Agent
+      ansible.builtin.package:
+        name: puppet-agent
+        state: present
+
+    - name: Clean up downloaded .deb file
+      ansible.builtin.file:
+        path: /tmp/puppet6-release-bionic.deb
+        state: absent
+
+    - name: Configure Puppet Agent
+      ansible.builtin.template:
+        src: puppet-agent.conf.j2
+        dest: /etc/puppetlabs/puppet/puppet.conf
+      notify: Restart Puppet Agent
+    
+    - name: Copy nginx configuration file
+      ansible.builtin.copy:
+        src: nginx_logs.pp
+        dest: /etc/puppetlabs/code/environments/production/manifests/nginx_logs.pp
+
+    - name: Ensure Puppet Agent is running
+      ansible.builtin.service:
+        name: puppet
+        state: started
+        enabled: true
+
+    - name: Apply nginx configuration using Puppet
+      ansible.builtin.command:
+        cmd: /opt/puppetlabs/bin/puppet apply /etc/puppetlabs/code/environments/production/manifests/nginx_logs.pp
+
+  handlers:
+    - name: Restart Puppet Agent
+      ansible.builtin.service:
+        name: puppet
+        state: restarted
+    
+    - name: Restart Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted

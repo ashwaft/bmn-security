@@ -1,0 +1,52 @@
+- hosts: vm2
+  become: true
+  tasks:
+    - name: Download Puppet repository configuration .deb file
+      ansible.builtin.get_url:
+        url: https://apt.puppetlabs.com/puppet6-release-bionic.deb
+        dest: /tmp/puppet6-release-bionic.deb
+
+    - name: Install Puppet repository configuration
+      ansible.builtin.command: dpkg -i /tmp/puppet6-release-bionic.deb
+      become: true
+
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install Puppet Server
+      ansible.builtin.package:
+        name: puppetserver
+        state: present
+   
+    - name: Run Puppet Server CA setup
+      ansible.builtin.command: /opt/puppetlabs/bin/puppetserver ca setup
+      become: true
+
+    - name: Start and enable Puppet Server
+      ansible.builtin.service:
+        name: puppetserver
+        state: started
+        enabled: true
+
+    - name: Install Rsyslog
+      ansible.builtin.package:
+        name: rsyslog
+        state: present
+    
+    - name: Ensure nginx log file exists
+      ansible.builtin.file:
+        path: /var/log/nginx.log
+        state: touch
+
+    - name: Configure Rsyslog to receive logs
+      ansible.builtin.template:
+        src: rsyslog.conf.j2
+        dest: /etc/rsyslog.conf
+      notify: Restart Rsyslog
+
+  handlers:
+    - name: Restart Rsyslog
+      ansible.builtin.service:
+        name: rsyslog
+        state: restarted
