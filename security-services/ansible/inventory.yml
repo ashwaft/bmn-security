@@ -1,6 +1,0 @@
-security-services:
-  hosts:
-    core-central-server:
-      ansible_host: core-central-server
-    log-server:
-      ansible_host: log-server
