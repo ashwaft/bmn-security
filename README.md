@@ -1,10 +1,10 @@
 ## Background
  
-POC to set up and foward logs to a Core Central Server. The assumption in this POC is that there is unfettered bi-directional traffic between our 2 networks. 
+POC to set up and forward logs from a VM in one network to a Core Central Server in another network, assuming unfettered bi-directional traffic between the networks. We will use Vagrant to provision our virtual machines with virtual box as our provider. We will also utilize Ansible and Puppet for configuration setup in our guest machines. 
 
 ## Pre-requisite
 
-Before proceeding, ensure you have the necessary tools installed on your host machine. We will use Vagrant to provision our virtual machines with virtual box as our provider. We will also utilize Ansible and Puppet for configuration setup in our guest machines. 
+Before proceeding, ensure you have the necessary tools installed on your host machine. 
 
 1. Vagrant: Open-source tool we can use to build and manage our virtual machines environments. This allows us to configure portable and consistent work environments. Vagrant streamlines the creation and management of virtual development environments using providers such as VirtualBox. Download link: https://releases.hashicorp.com/vagrant/
 
@@ -12,6 +12,7 @@ Before proceeding, ensure you have the necessary tools installed on your host ma
 
 3. Ansible: Used to automate deployment of configuration in our Ubuntu environment. Refer to official documentation for more information: https://docs.ansible.com/
 
+### Challenges
 For someone new to the tools above, these are some of the challenges and constraints that you might (or will) encounter when trying to set up your environment. 
 
 1.	Ansible control node is not supported on windows. We can only use any UNIX-like machine with Python installed. This includes Red Hat, Debian, Ubuntu, macOS, BSDs, and Windows under a Windows Subsystem for Linux (WSL) distribution. I learned this the hard way. Do not attempt to use Cygwin with windows as a workaround as you will still encounter blockers when deploying the runbook. Reference: https://blog.rolpdog.com/2020/03/why-no-ansible-controller-for-windows.html
@@ -33,7 +34,7 @@ For someone new to the tools above, these are some of the challenges and constra
 
 6. Using Puppet, have nginx installed in the BMN host
 
-7. Using Puppet, configure the BMN host to forward the nginx logs to the rsyslog server in theCore Central Server
+7. Using Puppet, configure the BMN host to forward the nginx logs to the rsyslog server in the Core Central Server
 
 ## Verification
 
